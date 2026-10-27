@@ -67,7 +67,7 @@ L_curv = mean_i Σₖ ‖cₖ‖² / ‖aₖ‖²
 ```
 
 Własności:
-- z rozwinięcia Taylora cₖ = ∂²φ[aₖ, aₖ] + O(‖aₖ‖⁴), więc kara jest **zerowa dla każdego ruchu afinicznego**: obrót, rozciąganie i ścinanie są darmowe (w przeciwieństwie do kary sprężystej ‖FᵀF − I‖², która ciągnie F do obrotu);
+- z rozwinięcia Taylora cₖ = ∂²φ[aₖ, aₖ] + O(‖aₖ‖⁴), więc kara jest **zerowa dla każdego ruchu afinicznego**: obrót, rozciąganie i ścinanie są darmowe (w przeciwieństwie do kary sprężystej, która ciągnie F do obrotu: w Nerfies to ‖log Σ‖²_F z wartości osobliwych Jacobianu, z odporną funkcją Geman–McClure i wagą równą udziałowi punktu w renderze; w zabawce użyto prostszego ‖FᵀF − I‖²);
 - to dokładnie człon pomijany przez przybliżenie pierwszego rzędu F Σ Fᵀ; transformacja unscented używa go do poprawki średniej;
 - nie wymaga sąsiadów (w przeciwieństwie do EER), skala dopasowuje się do każdego Gaussiana.
 
@@ -124,7 +124,7 @@ Kryterium: max po kilku chwilach t z ‖cₖ‖ / ‖aₖ‖ powyżej progu, wte
 | Grupa | Warianty |
 |---|---|
 | Baseline | Deformable 3DGS z repo; po poprawkach z 5.1 |
-| Konkurencyjne regularyzacje | kara sprężysta Nerfies (w punkcie i w skali Gaussiana); EER (kNN, własna implementacja, przegląd λ) |
+| Konkurencyjne regularyzacje | kara sprężysta Nerfies, wiernie: ‖log Σ‖²_F + Geman–McClure (w punkcie i w skali Gaussiana); EER (kNN, własna implementacja, przegląd λ) |
 | Metoda | + L_curv; + sprzężenie; + sprzężenie + L_curv; + podział (opcja) |
 | Ablacje | krok h (0,5; 1; √3; 2,5); λ_curv; liczba częstotliwości PE (6, 10, coarse-to-fine); aktywacja (ReLU, SiLU); obrót polarny wobec pełnego F; kamera skacząca wobec płynnej |
 
@@ -154,7 +154,7 @@ Monokular 2D: fantom Shepp–Logana odkształcany wirem, zoomem i przesunięciem
 | coarse-to-fine | +2,8 dB (3/3) | +0,3 dB |
 | L_curv (λ = 10⁻³) | +0,5 dB (3/3) | +0,1 dB (rozbieżnie) |
 | coarse-to-fine + L_curv wobec coarse-to-fine | +0,4 dB | 0 |
-| kara sprężysta (najlepsze λ, 1 ziarno) | +0,3 dB | +1,1 dB |
+| kara sprężysta ‖FᵀF − I‖² (najlepsze λ, 1 ziarno) | +0,3 dB | +1,1 dB |
 | sprzężenie F Σ Fᵀ | −0,4 dB (3/3) | ≈ 0 |
 | kodowanie z rozmiarem Gaussiana (jak mip-NeRF) | −0,8 dB (3/3) | −0,8 dB |
 | SiLU zamiast ReLU (2 ziarna) | +0,35 dB | −1,5 dB |
