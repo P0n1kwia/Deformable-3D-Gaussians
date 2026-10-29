@@ -56,7 +56,7 @@ class Embedder:
 
 
 class DeformNetwork(nn.Module):
-    def __init__(self, D=8, W=256, input_ch=3, output_ch=59, multires=10, is_blender=False, is_6dof=False):
+    def __init__(self, D=8, W=256, input_ch=3, output_ch=59, multires=10, is_blender=False, is_6dof=False, zero_init = False):
         super(DeformNetwork, self).__init__()
         self.D = D
         self.W = W
@@ -100,6 +100,14 @@ class DeformNetwork(nn.Module):
             self.gaussian_warp = nn.Linear(W, 3)
         self.gaussian_rotation = nn.Linear(W, 4)
         self.gaussian_scaling = nn.Linear(W, 3)
+
+        if zero_init:
+            assert not is_6dof, "Zero init currently does not support SE(3)"
+            heads = [self.gaussian_rotation, self.gaussian_scaling, self.gaussian_warp]
+            for head in heads:
+                nn.init.zeros_(head.weight)
+                nn.init.zeros_(head.bias)
+
 
     def forward(self, x, t):
         t_emb = self.embed_time_fn(t)

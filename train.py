@@ -34,7 +34,7 @@ except ImportError:
 def training(dataset, opt, pipe, testing_iterations, saving_iterations):
     tb_writer = prepare_output_and_logger(dataset)
     gaussians = GaussianModel(dataset.sh_degree)
-    deform = DeformModel(dataset.is_blender, dataset.is_6dof)
+    deform = DeformModel(dataset.is_blender, dataset.is_6dof,dataset.zero_init)
     deform.train_setting(opt)
 
     scene = Scene(dataset, gaussians)
