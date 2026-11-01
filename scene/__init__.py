@@ -77,6 +77,19 @@ class Scene:
             with open(os.path.join(self.model_path, "cameras.json"), 'w') as file:
                 json.dump(json_cams, file)
 
+        time_stride = getattr(args, "time_stride", 1)
+        assert time_stride == 1 or args.eval, "Without --eval blender reader pastes test cameras into training cameras"
+        kept, dropped = sampleByTime(scene_info.train_cameras,time_stride)
+        scene_info = scene_info._replace(train_cameras = kept)
+        self.dropped_cameras = dropped
+        if not self.loaded_iter:
+            split = {"stride": time_stride,
+                    "kept":    [[c.image_name, float(c.fid)] for c in kept],
+                    "dropped": [[c.image_name, float(c.fid)] for c in dropped]}
+            with open(os.path.join(self.model_path, "split.json"), "w") as f:
+                json.dump(split, f, indent=1)
+        print(f"[split] stride={time_stride}: {len(kept)}/{len(kept)+len(dropped)} frames, t in [{kept[0].fid:.3f}, {kept[-1].fid:.3f}]")
+           
         if shuffle:
             random.shuffle(scene_info.train_cameras)  # Multi-res consistent random shuffling
             random.shuffle(scene_info.test_cameras)  # Multi-res consistent random shuffling
@@ -109,3 +122,15 @@ class Scene:
 
     def getTestCameras(self, scale=1.0):
         return self.test_cameras[scale]
+
+    
+    
+def sampleByTime(cams,time_stride, offset = 0):
+    n = len(cams)
+    assert time_stride < n, f"Time_stride cannot be larger than amout of cameras. stride={time_stride}, number of cameras={n}"
+    order = sorted(range(n), key=lambda i : (float(cams[i].fid), cams[i].image_name))
+    keep = set(order[offset::time_stride])
+    kept = [c for i,c in enumerate(cams) if i in keep]
+    dropped = [c for i,c in enumerate(cams) if i not in keep]
+    return kept, dropped
+

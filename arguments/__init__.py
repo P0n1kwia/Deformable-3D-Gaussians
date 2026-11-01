@@ -61,6 +61,7 @@ class ModelParams(ParamGroup):
         self.is_blender = False
         self.is_6dof = False
         self.zero_init = False
+        self.time_stride = 1
         super().__init__(parser, "Loading Parameters", sentinel)
 
     def extract(self, args):

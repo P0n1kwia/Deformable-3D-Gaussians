@@ -81,6 +81,8 @@ def training(dataset, opt, pipe, testing_iterations, saving_iterations):
 
         total_frame = len(viewpoint_stack)
         time_interval = 1 / total_frame
+        #Potential problem as total frame is amount of left cameras
+        #Without AST no problem right now, to implement later
 
         viewpoint_cam = viewpoint_stack.pop(randint(0, len(viewpoint_stack) - 1))
         if dataset.load2gpu_on_the_fly:
